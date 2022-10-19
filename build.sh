@@ -15,6 +15,7 @@ IFS=$'\n\t'
 #  - libcurl uses zlib
 
 . ./common.sh
+repo=$(realpath .)
 
 tarball_hash() {
 	local tarball_name=$1
@@ -101,12 +102,17 @@ if [[ $BSH_HOST_PLATFORM == android ]]; then
 	fi
 fi
 
+meson_cross_configure=
 if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-msvc ]]; then
 	case $BSH_HOST_ARCH in
 	x86_64) vs_env_arch=x64;;
 	x86)    vs_env_arch=x86;;
 	esac
 	. ./vs-env.sh $vs_env_arch
+elif [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-mingw ]]; then
+	if [[ $BSH_BUILD_PLATFORM == linux ]]; then
+		meson_cross_configure+=$'\t'--cross-file=$repo/.github/mingw-ghactions.ini
+	fi
 elif [[ $BSH_HOST_PLATFORM == darwin ]]; then
 	# may need export SDKROOT=$(xcrun --show-sdk-path --sdk macosx11.1)
 	CC=clang
@@ -115,6 +121,7 @@ elif [[ $BSH_HOST_PLATFORM == darwin ]]; then
 		export MACOSX_DEPLOYMENT_TARGET=11.0
 		CC+=" -arch arm64"
 		CXX+=" -arch arm64"
+		meson_cross_configure+=$'\t'--cross-file=$repo/.github/macaa64-ghactions.ini
 	else
 		export MACOSX_DEPLOYMENT_TARGET=10.9
 		CC+=" -arch x86_64"
@@ -142,6 +149,21 @@ elif [[ $BSH_HOST_PLATFORM == android ]]; then
 	export CXX
 	export LD
 	export AR
+	meson_cross_configure+=$'\t'--cross-file=$repo/.github/android/cross/$BSH_HOST_ARCH.ini
+	cat << ANDROID_INI > .github/android-ghactions.ini
+[constants]
+andriod_ndk_toolchain_bin = '$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin'
+
+[properties]
+# android_ndk_toolchain_prefix comes from the correct cross-file in ./android/cross
+android_ndk_toolchain_prefix = android_ndk_toolchain_prefix
+
+[binaries]
+c = andriod_ndk_toolchain_bin / (android_ndk_toolchain_prefix + 'clang')
+cpp = andriod_ndk_toolchain_bin / (android_ndk_toolchain_prefix + 'clang++')
+strip = andriod_ndk_toolchain_bin / 'llvm-strip'
+ANDROID_INI
+	meson_cross_configure+=$'\t'--cross-file=$repo/.github/android-ghactions.ini
 else
 	export CC=gcc
 	export CXX=g++
@@ -789,6 +811,7 @@ function compile_bzip2() {
 		fi
 		meson_configure+=$'\t'-Ddefault_library=static
 	fi
+	meson_configure+=$meson_cross_configure
 	meson_configure+=$'\t'--prefix$'\t'$(export_path $zip_root_real)
 	$meson_configure build
 	cd build

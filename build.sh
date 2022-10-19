@@ -28,6 +28,8 @@ tarball_hash() {
 	SDL2-2.0.20.tar.gz)        sha256sum=c56aba1d7b5b0e7e999e4a7698c70b63a3394ff9704b5f6e1c57e0c16f04dd06;; # acquired from https://www.libsdl.org/release/SDL2-2.0.20.tar.gz
 	libpng-1.6.37.tar.gz)      sha256sum=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece9390fb4;; # acquired from https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
 	mbedtls-3.2.1.tar.gz)      sha256sum=d0e77a020f69ad558efc660d3106481b75bd3056d6301c31564e04a0faae88cc;; # acquired from https://codeload.github.com/Mbed-TLS/mbedtls/tar.gz/refs/tags/v3.2.1
+	jsoncpp-1.9.5.tar.gz)      sha256sum=f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2;; # acquired from https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.5.tar.gz
+	bzip2-1.0.8.tar.gz)        sha256sum=ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269;; # acquired from https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
 	*)                                         >&2 echo "no such tarball (update tarball_hash)" && exit 1;;
 	esac
 }
@@ -51,6 +53,10 @@ get_and_cd() {
 
 uncd_and_unget() {
 	cd ../../..
+}
+
+function dos2unix() {
+	sed -i 's/\r//' $1
 }
 
 if [[ -z ${NPROC-} ]]; then
@@ -273,9 +279,7 @@ function patch_breakpoint() {
 	esac
 	if [[ -f $patch_path ]]; then
 		>&2 echo ============== applying patch $patch_path ==============
-		if ! patch -p1 -i $patch_path; then
-			patch --binary -p1 -i $patch_path # windows :D
-		fi
+		patch -p1 -i $patch_path
 	fi
 	case $mode in
 	apply) ;;
@@ -321,6 +325,13 @@ release)
 	cmake_build_type=RelWithDebInfo
 	cmake_msvc_rt=MultiThreaded
 	;;
+esac
+msvc_rt=
+case $BSH_STATIC_DYNAMIC-$BSH_DEBUG_RELEASE in
+dynamic-debug) msvc_rt=MDd;;
+dynamic-release) msvc_rt=MD;;
+static-debug) msvc_rt=MTd;;
+static-release) msvc_rt=MT;;
 esac
 
 function windows_msvc_static_mt() {
@@ -726,6 +737,68 @@ function compile_fftw() {
 	uncd_and_unget
 }
 
+function compile_jsoncpp() {
+	get_and_cd jsoncpp-1.9.5.tar.gz
+	mkdir build
+	cmake_configure=cmake # not local because add_*_flags can't deal with that
+	cmake_configure+=$'\t'-G$'\t'Ninja
+	cmake_configure+=$'\t'-DCMAKE_BUILD_TYPE=$cmake_build_type
+	cmake_configure+=$'\t'-DJSONCPP_WITH_TESTS=OFF
+	cmake_configure+=$'\t'-DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF
+	cmake_configure+=$'\t'-DJSONCPP_WITH_PKGCONFIG_SUPPORT=OFF
+	cmake_configure+=$'\t'-DJSONCPP_WITH_CMAKE_PACKAGE=OFF
+	add_install_flags cmake_configure
+	if [[ $BSH_STATIC_DYNAMIC == static ]]; then
+		cmake_configure+=$'\t'-DBUILD_SHARED_LIBS=OFF
+		cmake_configure+=$'\t'-DBUILD_STATIC_LIBS=ON
+	else
+		cmake_configure+=$'\t'-DBUILD_SHARED_LIBS=ON
+		cmake_configure+=$'\t'-DBUILD_STATIC_LIBS=OFF
+	fi
+	cmake_configure+=$'\t'-DBUILD_OBJECT_LIBS=OFF
+	if [[ $BSH_HOST_PLATFORM == android ]]; then
+		add_android_flags cmake_configure
+	fi
+	cd build
+	VERBOSE=1 $cmake_configure ..
+	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC == windows-msvc-static ]]; then
+		cmake_configure+=$'\t'-DJSONCPP_STATIC_WINDOWS_RUNTIME=ON
+	fi
+	VERBOSE=1 cmake --build . -j$NPROC --config $cmake_build_type
+	VERBOSE=1 cmake --install . --config $cmake_build_type
+	cd ..
+	echo cec0db5f6d7ed6b3a72647bd50aed02e13c3377fd44382b96dc2915534c042ad LICENSE | sha256sum -c
+	cp LICENSE $zip_root_real/licenses/jsoncpp.LICENSE
+	uncd_and_unget
+}
+
+function compile_bzip2() {
+	get_and_cd bzip2-1.0.8.tar.gz
+	dos2unix libbz2.def
+	patch_breakpoint $patches_real/bzip2-meson.patch apply
+	local meson_configure=meson
+	if [[ $BSH_DEBUG_RELEASE == release ]]; then
+		meson_configure+=$'\t'-Dbuildtype=debugoptimized
+	else
+		meson_configure+=$'\t'-Dbuildtype=debug
+	fi
+	if [[ $BSH_STATIC_DYNAMIC == static ]]; then
+		if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-msvc ]]; then
+			meson_configure+=$'\t'-Db_vscrt=static_from_buildtype
+			meson_configure+=$'\t'-Dc_args="['/Z7']" # include debug info in the .lib
+		fi
+		meson_configure+=$'\t'-Ddefault_library=static
+	fi
+	meson_configure+=$'\t'--prefix$'\t'$(export_path $zip_root_real)
+	$meson_configure build
+	cd build
+	ninja -v install
+	cd ..
+	echo c6dbbf828498be844a89eaa3b84adbab3199e342eb5cb2ed2f0d4ba7ec0f38a3 LICENSE | sha256sum -c
+	cp LICENSE $zip_root_real/licenses/bzip2.LICENSE
+	uncd_and_unget
+}
+
 function compile() {
 	local what=$1 # $2 and up hold names of libraries that have to be compiled before $what
 	declare -n status=status_$what
@@ -747,6 +820,8 @@ function compile() {
 	status=compiled
 }
 
+compile bzip2
+compile jsoncpp
 compile mbedtls
 compile zlib
 compile curl zlib mbedtls

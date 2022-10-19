@@ -652,6 +652,9 @@ function compile_luajit() {
 			inplace_sed 's|/MT|/MTd|g' msvcbuild.bat # static, debug
 			inplace_sed 's|/MD|/MDd|g' msvcbuild.bat # dynamic, debug
 		fi
+		if [[ $BSH_HOST_ARCH == x86_64 ]]; then
+			msvcbuild_configure+=$'\t'gc64
+		fi
 		$msvcbuild_configure
 		mkdir $zip_root_real/luajit/lib
 		cp lua51.lib $zip_root_real/luajit/lib
@@ -691,6 +694,9 @@ function compile_luajit() {
 		make_configure+=$'\t'LUAJIT_A=" liblua.a"
 		if [[ $BSH_DEBUG_RELEASE != release ]]; then
 			make_configure+=$'\t'CCOPT=" -fomit-frame-pointer" # original has -O2
+		fi
+		if [[ $BSH_HOST_ARCH == x86_64 ]]; then
+			make_configure+=$'\t'XCFLAGS=" -DLUAJIT_ENABLE_GC64"
 		fi
 		make_configure+=$'\t'-j$NPROC
 		cd src

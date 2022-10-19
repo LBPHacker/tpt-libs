@@ -182,7 +182,11 @@ meson.override_dependency('libpng16', declare_dependency(
 	],
 ), static: is_static)
 
-jsoncpp_name = 'jsoncpp'
+if host_platform == 'windows' and host_libc == 'mingw'
+	jsoncpp_name = 'libjsoncpp'
+else
+	jsoncpp_name = 'jsoncpp'
+endif
 config_dlls_pre += [ [ join_paths(meson.current_source_dir(), 'bin'), jsoncpp_name + '.dll', 'all' ] ]
 meson.override_dependency('jsoncpp', declare_dependency(
 	dependencies: [
@@ -193,7 +197,11 @@ meson.override_dependency('jsoncpp', declare_dependency(
 	],
 ), static: is_static)
 
-bzip2_name = 'bz2'
+if host_platform == 'windows' and host_libc == 'mingw'
+	bzip2_name = 'libbz2'
+else
+	bzip2_name = 'bz2'
+endif
 config_dlls_pre += [ [ join_paths(meson.current_source_dir(), 'bin'), bzip2_name + '.dll', 'all' ] ]
 meson.override_dependency('bzip2', declare_dependency(
 	dependencies: [

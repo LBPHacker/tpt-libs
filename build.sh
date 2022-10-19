@@ -787,11 +787,11 @@ function compile_jsoncpp() {
 	if [[ $BSH_HOST_PLATFORM == android ]]; then
 		add_android_flags cmake_configure
 	fi
-	cd build
-	VERBOSE=1 $cmake_configure ..
 	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC == windows-msvc-static ]]; then
 		cmake_configure+=$'\t'-DJSONCPP_STATIC_WINDOWS_RUNTIME=ON
 	fi
+	cd build
+	VERBOSE=1 $cmake_configure ..
 	VERBOSE=1 cmake --build . -j$NPROC --config $cmake_build_type
 	VERBOSE=1 cmake --install . --config $cmake_build_type
 	cd ..

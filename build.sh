@@ -55,10 +55,6 @@ uncd_and_unget() {
 	cd ../../..
 }
 
-function dos2unix() {
-	sed -i 's/\r//' $1
-}
-
 if [[ -z ${NPROC-} ]]; then
 	NPROC=$(nproc)
 fi
@@ -226,7 +222,7 @@ function export_path() {
 	fi
 }
 
-function good_sed() {
+function inplace_sed() {
 	local subst=$1
 	local path=$2
 	if [[ $BSH_BUILD_PLATFORM == darwin ]]; then
@@ -234,6 +230,10 @@ function good_sed() {
 	else
 		sed -i $subst $path
 	fi
+}
+
+function dos2unix() {
+	inplace_sed 's/\r//' $1
 }
 
 function add_install_flags() {
@@ -335,7 +335,7 @@ static-release) msvc_rt=MT;;
 esac
 
 function windows_msvc_static_mt() {
-	good_sed 's|/MD|/MT|g' CMakeCache.txt # static msvcrt
+	inplace_sed 's|/MD|/MT|g' CMakeCache.txt # static msvcrt
 }
 
 function compile_zlib() {
@@ -421,7 +421,7 @@ function compile_libpng() {
 		windows_msvc_static_mt
 	fi
 	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC == windows-mingw-dynamic ]]; then
-		good_sed 's|CMAKE_C_FLAGS:STRING=|CMAKE_C_FLAGS:STRING=-fno-asynchronous-unwind-tables |g' CMakeCache.txt
+		inplace_sed 's|CMAKE_C_FLAGS:STRING=|CMAKE_C_FLAGS:STRING=-fno-asynchronous-unwind-tables |g' CMakeCache.txt
 	fi
 	VERBOSE=1 cmake --build . -j$NPROC --config $cmake_build_type
 	VERBOSE=1 cmake --install . --config $cmake_build_type
@@ -620,15 +620,15 @@ function compile_luajit() {
 		cd src
 		local msvcbuild_configure=./msvcbuild.bat
 		msvcbuild_configure+=$'\t'debug
-		good_sed 's|/O2|/O2 /MD|g' msvcbuild.bat # make sure we have an /MD to replace; dynamic, release
+		inplace_sed 's|/O2|/O2 /MD|g' msvcbuild.bat # make sure we have an /MD to replace; dynamic, release
 		if [[ $BSH_STATIC_DYNAMIC == static ]]; then
 			msvcbuild_configure+=$'\t'static
-			good_sed 's|/O2 /MD|/O2 /MT|g' msvcbuild.bat # static, release
-			good_sed 's|/Zi|/Z7|g' msvcbuild.bat # include debugging info in the .lib
+			inplace_sed 's|/O2 /MD|/O2 /MT|g' msvcbuild.bat # static, release
+			inplace_sed 's|/Zi|/Z7|g' msvcbuild.bat # include debugging info in the .lib
 		fi
 		if [[ $BSH_DEBUG_RELEASE != release ]]; then
-			good_sed 's|/MT|/MTd|g' msvcbuild.bat # static, debug
-			good_sed 's|/MD|/MDd|g' msvcbuild.bat # dynamic, debug
+			inplace_sed 's|/MT|/MTd|g' msvcbuild.bat # static, debug
+			inplace_sed 's|/MD|/MDd|g' msvcbuild.bat # dynamic, debug
 		fi
 		$msvcbuild_configure
 		mkdir $zip_root_real/luajit/lib
@@ -724,8 +724,8 @@ function compile_fftw() {
 	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC == windows-msvc-static ]]; then
 		windows_msvc_static_mt
 	fi
-	good_sed 's|HAVE_ALLOCA:INTERNAL=1|HAVE_ALLOCA:INTERNAL=0|g' CMakeCache.txt
-	good_sed 's|CMAKE_C_FLAGS:STRING=|CMAKE_C_FLAGS:STRING=-DWITH_OUR_MALLOC |g' CMakeCache.txt
+	inplace_sed 's|HAVE_ALLOCA:INTERNAL=1|HAVE_ALLOCA:INTERNAL=0|g' CMakeCache.txt
+	inplace_sed 's|CMAKE_C_FLAGS:STRING=|CMAKE_C_FLAGS:STRING=-DWITH_OUR_MALLOC |g' CMakeCache.txt
 	VERBOSE=1 cmake --build . -j$NPROC --config $cmake_build_type
 	VERBOSE=1 cmake --install . --config $cmake_build_type
 	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-msvc ]]; then

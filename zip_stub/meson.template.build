@@ -31,6 +31,18 @@ if host_platform != 'emscripten'
 	), static: is_static)
 endif
 
+if host_platform == 'windows' and host_libc == 'msvc'
+	meson.override_dependency('stackwalker', declare_dependency(
+		dependencies: [
+			c_compiler.find_library('stackwalker', dirs: join_paths(meson.current_source_dir(), lib_dir), static: true),
+		],
+		include_directories: [
+			include_directories('include'),
+		],
+		version: stackwalker_version,
+	), static: true)
+endif
+
 lua51_name = 'lua'
 if host_platform == 'windows' and host_libc == 'mingw' and not is_static
 	lua51_name += '51'

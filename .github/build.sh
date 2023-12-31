@@ -26,18 +26,19 @@ repo=$(realpath .)
 tarball_hash() {
 	local tarball_name=$1
 	case $tarball_name in
-	zlib-1.2.11.tar.gz)        sha256sum=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1;; # acquired from https://zlib.net/zlib-1.2.11.tar.gz
-	fftw-3.3.8.tar.gz)         sha256sum=6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303;; # acquired from http://www.fftw.org/fftw-3.3.8.tar.gz (eww http)
-	lua-5.1.5.tar.gz)          sha256sum=2640fc56a795f29d28ef15e13c34a47e223960b0240e8cb0a82d9b0738695333;; # acquired from https://www.lua.org/ftp/lua-5.1.5.tar.gz
-	lua-5.2.4.tar.gz)          sha256sum=b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b;; # acquired from https://www.lua.org/ftp/lua-5.2.4.tar.gz
-	LuaJIT-2.1.0-beta3.tar.gz) sha256sum=1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3;; # acquired from https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz
-	curl-7.86.0.tar.gz)        sha256sum=3dfdd39ba95e18847965cd3051ea6d22586609d9011d91df7bc5521288987a82;; # acquired from https://curl.se/download/curl-7.86.0.tar.gz
-	SDL2-2.24.2.tar.gz)        sha256sum=b35ef0a802b09d90ed3add0dcac0e95820804202914f5bb7b0feb710f1a1329f;; # acquired from https://github.com/libsdl-org/SDL/releases/download/release-2.24.2/SDL2-2.24.2.tar.gz
-	libpng-1.6.37.tar.gz)      sha256sum=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece9390fb4;; # acquired from https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
-	mbedtls-3.2.1.tar.gz)      sha256sum=d0e77a020f69ad558efc660d3106481b75bd3056d6301c31564e04a0faae88cc;; # acquired from https://codeload.github.com/Mbed-TLS/mbedtls/tar.gz/refs/tags/v3.2.1
-	jsoncpp-1.9.5.tar.gz)      sha256sum=f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2;; # acquired from https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.5.tar.gz
-	bzip2-1.0.8.tar.gz)        sha256sum=ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269;; # acquired from https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
-	nghttp2-1.50.0.tar.gz)     sha256sum=6de469efc8e9d47059327a6736aebe0a7d73f57e5e37ab4c4f838fb1eebd7889;; # acquired from https://github.com/nghttp2/nghttp2/archive/refs/tags/v1.50.0.tar.gz
+	zlib-1.2.11.tar.gz)            sha256sum=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1;; # acquired from https://zlib.net/zlib-1.2.11.tar.gz
+	fftw-3.3.8.tar.gz)             sha256sum=6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303;; # acquired from http://www.fftw.org/fftw-3.3.8.tar.gz (eww http)
+	lua-5.1.5.tar.gz)              sha256sum=2640fc56a795f29d28ef15e13c34a47e223960b0240e8cb0a82d9b0738695333;; # acquired from https://www.lua.org/ftp/lua-5.1.5.tar.gz
+	lua-5.2.4.tar.gz)              sha256sum=b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b;; # acquired from https://www.lua.org/ftp/lua-5.2.4.tar.gz
+	LuaJIT-2.1.0-beta3.tar.gz)     sha256sum=1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3;; # acquired from https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz
+	curl-7.86.0.tar.gz)            sha256sum=3dfdd39ba95e18847965cd3051ea6d22586609d9011d91df7bc5521288987a82;; # acquired from https://curl.se/download/curl-7.86.0.tar.gz
+	SDL2-2.24.2.tar.gz)            sha256sum=b35ef0a802b09d90ed3add0dcac0e95820804202914f5bb7b0feb710f1a1329f;; # acquired from https://github.com/libsdl-org/SDL/releases/download/release-2.24.2/SDL2-2.24.2.tar.gz
+	libpng-1.6.37.tar.gz)          sha256sum=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece9390fb4;; # acquired from https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
+	mbedtls-3.2.1.tar.gz)          sha256sum=d0e77a020f69ad558efc660d3106481b75bd3056d6301c31564e04a0faae88cc;; # acquired from https://codeload.github.com/Mbed-TLS/mbedtls/tar.gz/refs/tags/v3.2.1
+	jsoncpp-1.9.5.tar.gz)          sha256sum=f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2;; # acquired from https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.5.tar.gz
+	bzip2-1.0.8.tar.gz)            sha256sum=ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269;; # acquired from https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+	nghttp2-1.50.0.tar.gz)         sha256sum=6de469efc8e9d47059327a6736aebe0a7d73f57e5e37ab4c4f838fb1eebd7889;; # acquired from https://github.com/nghttp2/nghttp2/archive/refs/tags/v1.50.0.tar.gz
+	StackWalker-2023.06.24.tar.gz) sha256sum=021da7fc4e874409bdb6bfa65ab07e1e1704e5cc3282303868ef3872353cff4e;; # acquired from https://codeload.github.com/JochenKalmbach/StackWalker/tar.gz/refs/tags/2023-06-24
 	*)                                         >&2 echo "no such tarball (update tarball_hash)" && exit 1;;
 	esac
 }
@@ -494,6 +495,34 @@ function compile_mbedtls() {
 	echo cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 LICENSE | sha256sum -c
 	cp LICENSE $zip_root_real/licenses/mbedtls.LICENSE
 	uncd_and_unget
+}
+
+function compile_stackwalker() {
+	if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC != windows-msvc ]]; then
+		return
+	fi
+	get_and_cd StackWalker-2023.06.24.tar.gz stackwalker_version
+	patch_breakpoint $patches_real/stackwalker-windows-msvc-meson.patch apply
+	local meson_configure=meson$'\t'setup
+	if [[ $BSH_DEBUG_RELEASE == release ]]; then
+		meson_configure+=$'\t'-Dbuildtype=debugoptimized
+	else
+		meson_configure+=$'\t'-Dbuildtype=debug
+	fi
+	if [[ $BSH_STATIC_DYNAMIC == static ]]; then
+		meson_configure+=$'\t'-Db_vscrt=static_from_buildtype
+	fi
+	meson_configure+=$'\t'-Dcpp_args="['/Z7']" # include debug info in the .lib
+	meson_configure+=$meson_dirs_configure
+	meson_configure+=$'\t'--prefix$'\t'$(export_path $zip_root_real)
+	$meson_configure build
+	cd build
+	ninja -v install
+	cd ..
+	echo db98e5e103beba7bbe77fb6464178f8d036ebbef2e11040c27900991b680cb2e LICENSE | sha256sum -c
+	cp LICENSE $zip_root_real/licenses/stackwalker.LICENSE
+	uncd_and_unget
+	library_versions+="stackwalker_version = '$stackwalker_version-tpt-libs'"$'\n'
 }
 
 function compile_libpng() {
@@ -1051,6 +1080,7 @@ function compile() {
 	status=compiled
 }
 
+compile stackwalker
 compile nghttp2
 compile bzip2
 compile jsoncpp

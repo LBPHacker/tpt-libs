@@ -1,0 +1,16 @@
+diff -Naur StackWalker-2023-06-24.old/meson.build StackWalker-2023-06-24.new/meson.build
+--- StackWalker-2023-06-24.old/meson.build	1970-01-01 01:00:00.000000000 +0100
++++ StackWalker-2023-06-24.new/meson.build	2023-12-31 14:16:54.429803700 +0100
+@@ -0,0 +1,12 @@
++project('stackwalker', 'cpp')
++
++static_library(
++	'stackwalker',
++	sources: files(
++		'Main/StackWalker/StackWalker.cpp',
++	),
++	install: true,
++)
++install_headers([
++	'Main/StackWalker/StackWalker.h',
++])

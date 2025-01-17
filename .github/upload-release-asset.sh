@@ -1,6 +1,8 @@
 set -euo pipefail
 IFS=$'\t\n'
 
+. ./.github/gh-config.sh
+
 temp=.temp
 mkdir $temp
 cp $ASSET_PATH $temp/$ASSET_NAME

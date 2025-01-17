@@ -1,6 +1,5 @@
-BSH_GH_CONFIG=.tpt-libs-gh-config
-
-if [[ ! -d "$BSH_GH_CONFIG" ]]; then
+if [[ -z ${GH_CONFIG_DIR-} ]]; then
+	BSH_GH_CONFIG=.tpt-libs-gh-config
 	if [[ ! -z ${XDG_CONFIG_HOME-} ]]; then
 		src="$XDG_CONFIG_HOME/gh"
 	else

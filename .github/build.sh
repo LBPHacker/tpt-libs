@@ -148,7 +148,7 @@ if [[ -z ${BSH_NO_PACKAGES-} ]]; then
 			else
 				variant=i686
 			fi
-			pacman -S --noconfirm --needed mingw-w64-"$variant"-{gcc,cmake,make,ninja,meson,7zip} patch
+			pacman -S --noconfirm --needed p7zip mingw-w64-"$variant"-{gcc,cmake,make,ninja,meson} patch
 		fi
 		;;
 	android)

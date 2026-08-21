@@ -132,10 +132,9 @@ if host_platform != 'emscripten'
 				cpp_compiler.find_library('bcrypt'),
 			] : [],
 			host_platform == 'darwin' ? dependency('AppleFrameworks', modules: [
-				'Security',
 				'SystemConfiguration',
 			]) : [],
-			(is_static and (host_platform == 'linux' or host_platform == 'windows' or host_platform == 'android')) ? [
+			(is_static and (host_platform == 'darwin' or host_platform == 'linux' or host_platform == 'windows' or host_platform == 'android')) ? [
 				cpp_compiler.find_library('mbedcrypto', dirs: join_paths(meson.current_source_dir(), lib_dir), static: is_static),
 				cpp_compiler.find_library('mbedtls', dirs: join_paths(meson.current_source_dir(), lib_dir), static: is_static),
 				cpp_compiler.find_library('mbedx509', dirs: join_paths(meson.current_source_dir(), lib_dir), static: is_static),

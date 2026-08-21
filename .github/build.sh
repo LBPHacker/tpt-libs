@@ -555,7 +555,7 @@ function compile_zlib() {
 }
 
 function compile_mbedtls() {
-	if [[ $BSH_HOST_PLATFORM == darwin ]] || [[ $BSH_HOST_PLATFORM == emscripten ]]; then
+	if [[ $BSH_HOST_PLATFORM == emscripten ]]; then
 		return
 	fi
 	get_and_cd mbedtls-3.6.4.tar.bz2 mbedtls_version
@@ -676,11 +676,7 @@ function compile_curl() {
 		cmake_configure+=$'\t'-DCMAKE_PDB_OUTPUT_DIRECTORY=$(export_path $(realpath build))
 		curl_version+="+mbedtls-$mbedtls_version"
 	fi
-	if [[ $BSH_HOST_PLATFORM == darwin ]]; then
-		cmake_configure+=$'\t'-DCURL_USE_SECTRANSP=ON
-		cmake_configure+=$'\t'-DCURL_CA_PATH=none
-	fi
-	if [[ $BSH_HOST_PLATFORM == linux ]] || [[ $BSH_HOST_PLATFORM == android ]]; then
+	if [[ $BSH_HOST_PLATFORM == darwin ]] || [[ $BSH_HOST_PLATFORM == linux ]] || [[ $BSH_HOST_PLATFORM == android ]]; then
 		cmake_configure+=$'\t'-DCURL_USE_MBEDTLS=ON
 		cmake_configure+=$'\t'-DCURL_CA_PATH=none
 		curl_version+="+mbedtls-$mbedtls_version"
